@@ -1,9 +1,5 @@
 /* eslint-disable max-len */
 module.exports = {
-  getCurrentTime: () => {
-    const date = new Date().toISOString();
-    return date;
-  },
   ERROR: (res, code, status, message) => {
     const response = res.response({
       status,
@@ -35,15 +31,4 @@ module.exports = {
     response.code(code);
     return response;
   },
-  // VALIDATE: (params, type) => {
-  //   if (params.name === null || params.name === undefined) {
-  //     return `Gagal ${type === 'insert' ? 'menambahkan' : 'memperbarui'} buku. Mohon isi nama buku`;
-  //   }
-
-  //   if (params.readPage > params.pageCount) {
-  //     return `Gagal ${type === 'insert' ? 'menambahkan' : 'memperbarui'} buku. readPage tidak boleh lebih besar dari pageCount`;
-  //   }
-
-  //   return null;
-  // },
 };

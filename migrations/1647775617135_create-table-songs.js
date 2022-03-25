@@ -26,7 +26,7 @@ exports.up = pgm => {
       notNull: true,
     },
     song_duration: {
-      type: 'VARCHAR(50)',
+      type: 'integer',
       notNull: false,
     },
     song_album_id: {
