@@ -3,7 +3,7 @@
 const tableName = 'albums';
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
-const { mapAlbumDBToModel } = require('../../utils');
+const { mapAlbumDBToModel, mapSongsDBToModel } = require('../../utils');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const ServerError = require('../../exceptions/ServerError');
@@ -34,15 +34,12 @@ class AlbumService {
   }
 
   async getAlbumById(id) {
-    // const songs = this.getSongsByAlbumId(id);
-
     const query = {
       text: `SELECT * FROM ${tableName} where album_id = $1`,
       values: [id],
     };
 
     const result = await this._pool.query(query);
-    // result.rows.songs = songs;
 
     if (!result) {
       throw new ServerError('There is something happen on server :D');
@@ -71,7 +68,7 @@ class AlbumService {
       throw new NotFoundError('Songs by album_id not found');
     }
 
-    return result.rows;
+    return result.rows.map(mapSongsDBToModel);
   }
 
   async editAlbumById(id, data) {

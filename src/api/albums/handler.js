@@ -35,7 +35,7 @@ class AlbumsHandler {
       const { id } = req.params;
       const album = await this._service.getAlbumById(id);
       const songs = await this._service.getSongsByAlbumId(id);
-      album.songs = [songs];
+      album.songs = songs;
       return SUCCESS(res, 200, 'success', '', { album });
     } catch (error) {
       if (error instanceof ClientError) {
