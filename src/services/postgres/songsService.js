@@ -59,13 +59,6 @@ class SongService {
   }
 
   async editSongById(id, data) {
-    // const query = {
-    //   text: `UPDATE ${tableName}
-    //   SET song_title = $1, song_year = $2, song_performer = $3, song_genre = $4, song_duration = $5, song_album_id = $6
-    //   WHERE song_id = $7 RETURNING song_id`,
-    //   values: [data.title, data.year, data.performer, data.genre, data.duration, data.albumId, id],
-    // };
-
     const query = {
       text: `UPDATE ${tableName}
       SET song_title = $1, song_year = $2, song_performer = $3, song_genre = $4, song_duration = $5

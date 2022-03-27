@@ -64,16 +64,10 @@ class AlbumService {
       throw new ServerError('There is something happen on server :D');
     }
 
-    if (!result.rows.length) {
-      throw new NotFoundError('Songs by album_id not found');
-    }
-
     return result.rows.map(mapSongsDBToModel);
   }
 
   async editAlbumById(id, data) {
-    this.getAlbumById(id);
-
     const query = {
       text: 'UPDATE albums set album_name = $1, album_year = $2 where album_id = $3 RETURNING album_id',
       values: [data.name, data.year, id],
