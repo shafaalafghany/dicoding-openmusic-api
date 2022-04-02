@@ -18,10 +18,13 @@ class SongHandler {
   async postAddSongHandler(req, res) {
     try {
       this._validator.validateSongPayload(req.payload);
+      let songId;
 
-      // if (req.payload.albumId === undefined) req.payload.albumId = '';
-
-      const songId = await this._service.addSong(req.payload);
+      if (req.payload.albumId !== undefined) {
+        songId = await this._service.addSongWithAlbumId(req.payload);
+      } else {
+        songId = await this._service.addSong(req.payload);
+      }
 
       return SUCCESS(res, 201, 'success', 'add song successful', { songId });
     } catch (error) {
@@ -35,7 +38,19 @@ class SongHandler {
 
   async getSongsHandler(req, res) {
     try {
-      const songs = await this._service.getSongs();
+      const { title, performer } = req.query;
+      let songs;
+      console.log(req.query.title);
+      if (title !== undefined && performer !== undefined) {
+        songs = await this._service.getSongByTitleAndPerformer(req.query);
+      } else if (title !== undefined) {
+        songs = await this._service.getSongByTitle(req.query.title);
+      } else if (performer !== undefined) {
+        songs = await this._service.getSongByPerformer(req.query.performer);
+      } else {
+        songs = await this._service.getSongs();
+      }
+
       return SUCCESS(res, 200, 'success', '', { songs });
     } catch (error) {
       if (error instanceof ClientError) {
