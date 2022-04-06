@@ -9,5 +9,5 @@ class AlbumService {
   constructor() {
     this._pool = new Pool();
   }
-
+  
 }
