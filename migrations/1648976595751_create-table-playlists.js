@@ -18,6 +18,7 @@ exports.up = pgm => {
       notNull: true,
       references: '"users"',
       onUpdate: 'cascade',
+      onDelete: 'SET null',
     },
   });
 };

@@ -40,7 +40,6 @@ class SongHandler {
     try {
       const { title, performer } = req.query;
       let songs;
-      console.log(req.query.title);
       if (title !== undefined && performer !== undefined) {
         songs = await this._service.getSongByTitleAndPerformer(req.query);
       } else if (title !== undefined) {

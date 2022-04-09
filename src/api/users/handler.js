@@ -8,7 +8,7 @@ class UsersHandler {
     this._service = service;
     this._validator = validator;
 
-    this._postAddUserHandler = this.postAddUserHandler.bind(this);
+    this.postAddUserHandler = this.postAddUserHandler.bind(this);
   }
 
   async postAddUserHandler(req, res) {
@@ -20,10 +20,10 @@ class UsersHandler {
       return SUCCESS(res, 201, 'success', 'add new user successful', { userId });
     } catch (error) {
       if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
+        return ERROR(res, 400, 'fail', error.message);
       }
 
-      return ERROR(res, error.statusCode, 'fail', error.message);
+      return ERROR(res, 500, 'error', error.message);
     }
   }
 }

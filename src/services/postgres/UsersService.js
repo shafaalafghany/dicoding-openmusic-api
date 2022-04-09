@@ -5,7 +5,7 @@ const { nanoid } = require('nanoid');
 const bcrypt = require('bcrypt');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-// const AuthenticationError = require('../../exceptions/AuthenticationError');
+const AuthenticationError = require('../../exceptions/AuthenticationError');
 
 class UsersService {
   constructor() {
@@ -56,6 +56,29 @@ class UsersService {
     }
 
     return result.rows[0];
+  }
+
+  async verifyUserCredential(data) {
+    const query = {
+      text: `SELECT user_id, user_password FROM ${tableName} where user_username = $1`,
+      values: [data.username],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new AuthenticationError('Wrong username or password');
+    }
+
+    const { user_id: UserId, user_password: hashedPassword } = result.rows[0];
+
+    const match = await bcrypt.compare(data.password, hashedPassword);
+
+    if (!match) {
+      throw new AuthenticationError('Wrong username or password');
+    }
+
+    return UserId;
   }
 }
 

@@ -14,12 +14,14 @@ exports.up = pgm => {
       notNull: true,
       references: '"playlists"',
       onUpdate: 'cascade',
+      onDelete: 'SET null',
     },
     user_id: {
       type: 'VARCHAR(50)',
       notNull: true,
       references: '"users"',
       onUpdate: 'cascade',
+      onDelete: 'SET null',
     },
   });
 };
