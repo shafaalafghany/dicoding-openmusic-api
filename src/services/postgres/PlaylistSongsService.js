@@ -7,6 +7,7 @@ const { nanoid } = require('nanoid');
 const { mapSongsDBToModel } = require('../../utils');
 const InvariantError = require('../../exceptions/InvariantError');
 const ServerError = require('../../exceptions/ServerError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class PlaylistSongsService {
   constructor(playlistsService, songsService) {
@@ -53,7 +54,7 @@ class PlaylistSongsService {
   async deleteSong(data) {
     const query = {
       text: `DELETE FROM ${tableName}
-      WHERE playlist_song_id = $1 and song_id = $2
+      WHERE playlist_id = $1 AND song_id = $2
       RETURNING playlist_song_id`,
       values: [data.playlistId, data.songId],
     };

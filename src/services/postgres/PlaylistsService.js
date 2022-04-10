@@ -1,8 +1,9 @@
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable no-underscore-dangle */
 const tableName = 'playlists';
+const anotherTableName = 'users';
 const { Pool } = require('pg');
-const { nanoid } = require('nanoid')
+const { nanoid } = require('nanoid');
 const { mapPlaylistsDBToModel } = require('../../utils');
 const ServerError = require('../../exceptions/ServerError');
 const InvariantError = require('../../exceptions/InvariantError');
@@ -35,18 +36,28 @@ class PlaylistsService {
   }
 
   async getPlaylistById(id) {
-    const result = await this._pool.query(`SELECT * FROM ${tableName} WHERE playlist_id = ${id}`);
+    const query = {
+      text: `SELECT p.playlist_id, p.playlist_name, u.user_username
+       FROM ${tableName} p
+       JOIN ${anotherTableName} u on p.playlist_owner = u.user_id
+       WHERE playlist_id = $1`,
+      values: [id],
+    };
+    const result = await this._pool.query(query);
 
     if (!result.rows.length) {
       throw new NotFoundError('playlist not found');
     }
 
-    return result.rows[0].map(mapPlaylistsDBToModel);
+    return result.rows.map(mapPlaylistsDBToModel);
   }
 
   async getAllPlaylists(id) {
     const query = {
-      text: `SELECT * FROM ${tableName} where playlist_owner = $1`,
+      text: `SELECT p.playlist_id, p.playlist_name, u.user_username
+       FROM ${tableName} p
+       JOIN ${anotherTableName} u on p.playlist_owner = u.user_id
+       WHERE p.playlist_owner = $1`,
       values: [id],
     };
 

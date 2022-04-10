@@ -15,7 +15,7 @@ exports.up = pgm => {
     },
     playlist_owner: {
       type: 'VARCHAR(50)',
-      notNull: true,
+      notNull: false,
       references: '"users"',
       onUpdate: 'cascade',
       onDelete: 'SET null',
