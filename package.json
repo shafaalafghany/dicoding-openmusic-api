@@ -1,6 +1,6 @@
 {
-  "name": "open-music-app-v1",
-  "version": "1.0.0",
+  "name": "open-music-app",
+  "version": "2.0.0",
   "description": "Backend Fundamental Dicoding Submission",
   "main": "./src/server.js",
   "scripts": {
