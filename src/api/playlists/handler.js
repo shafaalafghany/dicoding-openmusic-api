@@ -4,9 +4,15 @@ const ClientError = require('../../exceptions/ClientError');
 const { SUCCESS, ERROR } = require('../../utils/constant');
 
 class PlaylistsHandler {
-  constructor(playlistsService, playlistSongsService, validator) {
+  constructor(
+    playlistsService,
+    playlistSongsService,
+    playlistActivities,
+    validator,
+  ) {
     this._playlistsService = playlistsService;
     this._playlistSongsService = playlistSongsService;
+    this._playlistActivities = playlistActivities;
     this._validator = validator;
 
     this.postAddPlaylistHandler = this.postAddPlaylistHandler.bind(this);
@@ -15,6 +21,7 @@ class PlaylistsHandler {
     this.postAddSongHandler = this.postAddSongHandler.bind(this);
     this.getAllSongsHandler = this.getAllSongsHandler.bind(this);
     this.deleteSongHandler = this.deleteSongHandler.bind(this);
+    this.getAllActivityHandler = this.getAllActivityHandler.bind(this);
   }
 
   async postAddPlaylistHandler(req, res) {
@@ -42,7 +49,9 @@ class PlaylistsHandler {
 
       req.payload.playlistId = playlistId;
       req.payload.userId = userId;
+      req.payload.action = 'add';
       await this._playlistSongsService.addSong(req.payload);
+      await this._playlistActivities.addActivities(req.payload);
 
       return SUCCESS(res, 201, 'success', 'add song to playlist successful');
     } catch (error) {
@@ -67,6 +76,27 @@ class PlaylistsHandler {
       }
 
       return ERROR(res, error.statusCode, 'error', error.message);
+    }
+  }
+
+  async getAllActivityHandler(req, res) {
+    try {
+      const { id: playlistId } = req.params;
+      const { id: userId } = req.auth.credentials;
+      const data = {
+        playlistId,
+        userId,
+      };
+
+      await this._playlistsService.verifyPlaylistOwner(data);
+      const activities = await this._playlistActivities.getAllActivities(data);
+      return SUCCESS(res, 200, 'success', '', { playlistId, activities });
+    } catch (error) {
+      if (error instanceof ClientError) {
+        return ERROR(res, error.statusCode, 'fail', error.message);
+      }
+
+      return ERROR(res, 500, 'error', error.message);
     }
   }
 
@@ -123,10 +153,12 @@ class PlaylistsHandler {
         playlistId,
         userId,
         songId: req.payload.songId,
+        action: 'delete',
       };
 
       await this._playlistsService.verifyPlaylistOwner(data);
       await this._playlistSongsService.deleteSong(data);
+      await this._playlistActivities.addActivities(data);
       return SUCCESS(res, 200, 'success', 'delete song from this playlist successful');
     } catch (error) {
       if (error instanceof ClientError) {

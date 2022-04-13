@@ -45,9 +45,22 @@ const mapPlaylistsDBToModel = ({
   username: user_username,
 });
 
+const mapActivitiesDBToModel = ({
+  user_username,
+  song_title,
+  playlist_song_activity_action,
+  playlist_song_activity_time,
+}) => ({
+  username: user_username,
+  title: song_title,
+  action: playlist_song_activity_action,
+  time: playlist_song_activity_time,
+});
+
 module.exports = {
   mapAlbumDBToModel,
   mapSongDBToModel,
   mapSongsDBToModel,
   mapPlaylistsDBToModel,
+  mapActivitiesDBToModel,
 };

@@ -16,7 +16,7 @@ const TokenManager = {
     } catch (error) {
       throw new InvariantError('Token not validdd');
     }
-  }
+  },
 };
 
 module.exports = TokenManager;

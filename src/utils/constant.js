@@ -1,5 +1,9 @@
 /* eslint-disable max-len */
 module.exports = {
+  getCurrentTime: () => {
+    const date = new Date().toISOString();
+    return date;
+  },
   ERROR: (res, code, status, message) => {
     const response = res.response({
       status,

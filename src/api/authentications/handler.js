@@ -20,7 +20,6 @@ class AuthenticationsHandler {
       this._validator.validatePostAuthenticationPayload(req.payload);
 
       const userId = await this._usersService.verifyUserCredential(req.payload);
-      
       const accessToken = this._tokenManager.generateAccessToken({ userId });
       const refreshToken = this._tokenManager.generateRefreshToken({ userId });
 
@@ -39,7 +38,6 @@ class AuthenticationsHandler {
   async putAuthenticationHandler(req, res) {
     try {
       this._validator.validatePutAuthenticationPayload(req.payload);
-      
       const { refreshToken } = req.payload;
       await this._authenticationsService.verifyRefreshToken(refreshToken);
       const { userId } = await this._tokenManager.verifyRefreshToken(refreshToken);

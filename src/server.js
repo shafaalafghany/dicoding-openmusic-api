@@ -3,32 +3,33 @@ require('dotenv').config();
 const hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 
-//Albums
+//  Albums
 const albums = require('./api/albums');
 const AlbumService = require('./services/postgres/AlbumsService');
 const AlbumsValidator = require('./validator/albums');
 
-//Songs
+//  Songs
 const songs = require('./api/songs');
 const SongService = require('./services/postgres/SongsService');
 const SongsValidator = require('./validator/songs');
 
-//Users
+//  Users
 const users = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
 
-//Authentications
+//  Authentications
 const authentications = require('./api/authentications');
 const AuthenticationService = require('./services/postgres/AuthenticationsService');
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
 
-//Playlists
+//  Playlists
 const playlists = require('./api/playlists');
 const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PlaylistSongsService = require('./services/postgres/PlaylistSongsService');
-const PlaylistsValidator = require('./validator/playlists')
+const PlaylistActivitiesService = require('./services/postgres/PlaylistActivities');
+const PlaylistsValidator = require('./validator/playlists');
 
 const init = async () => {
   const albumsService = new AlbumService();
@@ -36,6 +37,7 @@ const init = async () => {
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationService();
   const playlistsService = new PlaylistsService();
+  const playlistActivities = new PlaylistActivitiesService();
   const playlistSongsService = new PlaylistSongsService(playlistsService, songsService);
   const server = hapi.server({
     port: process.env.PORT,
@@ -105,6 +107,7 @@ const init = async () => {
       options: {
         playlistsService,
         playlistSongsService,
+        playlistActivities,
         validator: PlaylistsValidator,
       },
     },
