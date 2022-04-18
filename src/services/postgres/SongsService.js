@@ -14,7 +14,7 @@ class SongService {
   }
 
   async addSong(data) {
-    const id = nanoid(16);
+    const id = `song-${nanoid(16)}`;
     const query = {
       text: `INSERT INTO ${tableName} values ($1, $2, $3, $4, $5, $6, $7) RETURNING song_id`,
       values: [id, data.title, data.year, data.performer, data.genre, data.duration, data.albumId],
@@ -54,7 +54,7 @@ class SongService {
   }
 
   async getSongs() {
-    const result = await this._pool.query(`SELECT * FROM ${tableName}`);
+    const result = await this._pool.query(`SELECT song_id, song_title, song_performer FROM ${tableName}`);
 
     return result.rows.map(mapSongsDBToModel);
   }

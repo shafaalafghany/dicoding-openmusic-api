@@ -79,7 +79,6 @@ class SongHandler {
     try {
       this._validator.validateSongPayload(req.payload);
       const { id } = req.params;
-      // if (req.payload.albumId === undefined) req.payload.albumId = '';
 
       await this._service.editSongById(id, req.payload);
 
