@@ -3,11 +3,13 @@ const mapAlbumDBToModel = ({
   album_id,
   album_name,
   album_year,
+  album_cover,
   songs,
 }) => ({
   id: album_id,
   name: album_name,
   year: album_year,
+  coverUrl: album_cover,
   songs,
 });
 

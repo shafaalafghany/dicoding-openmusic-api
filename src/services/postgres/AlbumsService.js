@@ -67,6 +67,23 @@ class AlbumService {
     return result.rows.map(mapSongsDBToModel);
   }
 
+  async addCoverByAlbumId(id, fileName) {
+    const query = {
+      text: `UPDATE ${tableName} set album_cover = $1 WHERE album_id = $2 RETURNING album_id`,
+      values: [fileName, id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result) {
+      throw new ServerError('There is something happen on server :D');
+    }
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Failed to renew album. Id not found');
+    }
+  }
+
   async editAlbumById(id, data) {
     const query = {
       text: 'UPDATE albums set album_name = $1, album_year = $2 where album_id = $3 RETURNING album_id',
