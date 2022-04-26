@@ -12,7 +12,7 @@ module.exports = {
     response.code(code);
     return response;
   },
-  SUCCESS: (res, code, status, message, data) => {
+  SUCCESS: (res, code, status, message, data, cache = false) => {
     let result;
     if (message === '' || message == null) {
       result = {
@@ -32,6 +32,9 @@ module.exports = {
       };
     }
     const response = res.response(result);
+    if (cache) {
+      response.header('X-Data-Source', 'cache');
+    }
     response.code(code);
     return response;
   },
