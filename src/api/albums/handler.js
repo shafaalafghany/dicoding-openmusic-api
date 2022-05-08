@@ -4,14 +4,17 @@ const ClientError = require('../../exceptions/ClientError');
 const { SUCCESS, ERROR } = require('../../utils/constant');
 
 class AlbumsHandler {
-  constructor(AlbumsService, StorageService, validator) {
+  constructor(AlbumsService, StorageService, UserAlbumLikesService, validator) {
     this._albumsService = AlbumsService;
     this._storageService = StorageService;
+    this._userAlbumLikesService = UserAlbumLikesService;
     this._validator = validator;
 
     this.postAlbumHandler = this.postAlbumHandler.bind(this);
     this.postUploadCoverHandler = this.postUploadCoverHandler.bind(this);
+    this.postAlbumLikeHandler = this.postAlbumLikeHandler.bind(this);
     this.getAlbumByIdHandler = this.getAlbumByIdHandler.bind(this);
+    this.getAlbumLikeHandler = this.getAlbumLikeHandler.bind(this);
     this.putAlbumByIdHandler = this.putAlbumByIdHandler.bind(this);
     this.deleteAlbumByIdHandler = this.deleteAlbumByIdHandler.bind(this);
   }
@@ -48,6 +51,50 @@ class AlbumsHandler {
       await this._albumsService.addCoverByAlbumId(id, fileLocation);
 
       return SUCCESS(res, 201, 'success', 'Sampul berhasil diunggah');
+    } catch (error) {
+      if (error instanceof ClientError) {
+        return ERROR(res, error.statusCode, 'fail', error.message);
+      }
+
+      return ERROR(res, error.statusCode, 'error', error.message);
+    }
+  }
+
+  async postAlbumLikeHandler(req, res) {
+    try {
+      const { id: userId } = req.auth.credentials;
+      const { id: albumId } = req.params;
+      const data = {
+        userId,
+        albumId,
+      };
+
+      await this._albumsService.getAlbumById(albumId);
+      const checkLike = await this._userAlbumLikesService.checkLike(data);
+
+      if (checkLike > 0) {
+        await this._userAlbumLikesService.deleteLike(data);
+      } else {
+        await this._userAlbumLikesService.addLike(data);
+      }
+
+      return SUCCESS(res, 201, 'success', 'Permintaan anda sedang diproses');
+    } catch (error) {
+      if (error instanceof ClientError) {
+        return ERROR(res, error.statusCode, 'fail', error.message);
+      }
+
+      return ERROR(res, error.statusCode, 'error', error.message);
+    }
+  }
+
+  async getAlbumLikeHandler(req, res) {
+    try {
+      const { id } = req.params;
+      const { likes, cache } = await this._userAlbumLikesService.getLikesByAlbumId(id);
+      const like = parseInt(likes, 10);
+
+      return SUCCESS(res, 200, 'success', '', { likes: like }, cache);
     } catch (error) {
       if (error instanceof ClientError) {
         return ERROR(res, error.statusCode, 'fail', error.message);

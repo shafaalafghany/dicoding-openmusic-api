@@ -78,6 +78,25 @@ class SongService {
     return result.rows.map(mapSongDBToModel)[0];
   }
 
+  async getSongByAlbumId(id) {
+    const query = {
+      text: `SELECT * FROM ${tableName} WHERE song_album_id = $1`,
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result) {
+      throw new ServerError('There is something happen on server :D');
+    }
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Id album not found');
+    }
+
+    return result.rows.map(mapSongsDBToModel);
+  }
+
   async getSongByTitle(title) {
     const query = {
       text: "SELECT * FROM songs where LOWER(song_title) LIKE '%' || $1 || '%'",
