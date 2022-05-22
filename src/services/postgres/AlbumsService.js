@@ -1,4 +1,3 @@
-/* eslint-disable no-trailing-spaces */
 /* eslint-disable no-underscore-dangle */
 const tableName = 'albums';
 const { nanoid } = require('nanoid');
@@ -12,7 +11,7 @@ class AlbumService {
   constructor() {
     this._pool = new Pool();
   }
-  
+
   async addAlbum(data) {
     const id = nanoid(16);
     const query = {
@@ -29,7 +28,7 @@ class AlbumService {
     if (!result.rows[0].album_id) {
       throw new InvariantError('Failed to add album');
     }
-    
+
     return result.rows[0].album_id;
   }
 
