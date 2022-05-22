@@ -1,7 +1,5 @@
-/* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
-const ClientError = require('../../exceptions/ClientError');
-const { SUCCESS, ERROR } = require('../../utils/constant');
+const { SUCCESS } = require('../../utils/constant');
 
 class AlbumsHandler {
   constructor(AlbumsService, StorageService, UserAlbumLikesService, validator) {
@@ -20,136 +18,81 @@ class AlbumsHandler {
   }
 
   async postAlbumHandler(req, res) {
-    try {
-      this._validator.validateAlbumPayload(req.payload);
+    this._validator.validateAlbumPayload(req.payload);
+    const albumId = await this._albumsService.addAlbum(req.payload);
 
-      const albumId = await this._albumsService.addAlbum(req.payload);
-
-      return SUCCESS(res, 201, 'success', 'add album successful', { albumId });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
-
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 201, 'success', 'add album successful', { albumId });
   }
 
   async postUploadCoverHandler(req, res) {
-    try {
-      const { cover } = req.payload;
-      const { id } = req.params;
-      this._validator.validateImageHeaders(cover.hapi.headers);
-      const newData = {
-        cover,
-        meta: cover.hapi,
-      };
+    const { cover } = req.payload;
+    const { id } = req.params;
 
-      const filename = await this._storageService.writeFile(newData);
-      const fileLocation = `http://${process.env.HOST}:${process.env.PORT}/albums/images/${filename}`;
+    this._validator.validateImageHeaders(cover.hapi.headers);
 
-      await this._albumsService.addCoverByAlbumId(id, fileLocation);
+    const newData = {
+      cover,
+      meta: cover.hapi,
+    };
+    const filename = await this._storageService.writeFile(newData);
+    const fileLocation = `http://${process.env.HOST}:${process.env.PORT}/albums/images/${filename}`;
 
-      return SUCCESS(res, 201, 'success', 'Sampul berhasil diunggah');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    await this._albumsService.addCoverByAlbumId(id, fileLocation);
 
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 201, 'success', 'Sampul berhasil diunggah');
   }
 
   async postAlbumLikeHandler(req, res) {
-    try {
-      const { id: userId } = req.auth.credentials;
-      const { id: albumId } = req.params;
-      const data = {
-        userId,
-        albumId,
-      };
+    const { id: userId } = req.auth.credentials;
+    const { id: albumId } = req.params;
+    const data = {
+      userId,
+      albumId,
+    };
 
-      await this._albumsService.getAlbumById(albumId);
-      const checkLike = await this._userAlbumLikesService.checkLike(data);
+    await this._albumsService.getAlbumById(albumId);
+    const checkLike = await this._userAlbumLikesService.checkLike(data);
 
-      if (checkLike > 0) {
-        await this._userAlbumLikesService.deleteLike(data);
-      } else {
-        await this._userAlbumLikesService.addLike(data);
-      }
-
-      return SUCCESS(res, 201, 'success', 'Permintaan anda sedang diproses');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
-
-      return ERROR(res, error.statusCode, 'error', error.message);
+    if (checkLike > 0) {
+      await this._userAlbumLikesService.deleteLike(data);
+    } else {
+      await this._userAlbumLikesService.addLike(data);
     }
+
+    return SUCCESS(res, 201, 'success', 'Permintaan anda sedang diproses');
   }
 
   async getAlbumLikeHandler(req, res) {
-    try {
-      const { id } = req.params;
-      const { likes, cache } = await this._userAlbumLikesService.getLikesByAlbumId(id);
-      const like = parseInt(likes, 10);
+    const { id } = req.params;
+    const { likes, cache } = await this._userAlbumLikesService.getLikesByAlbumId(id);
+    const like = parseInt(likes, 10);
 
-      return SUCCESS(res, 200, 'success', '', { likes: like }, cache);
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
-
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', '', { likes: like }, cache);
   }
 
   async getAlbumByIdHandler(req, res) {
-    try {
-      const { id } = req.params;
-      const album = await this._albumsService.getAlbumById(id);
-      const songs = await this._albumsService.getSongsByAlbumId(id);
-      album.songs = songs;
-      return SUCCESS(res, 200, 'success', '', { album });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    const { id } = req.params;
+    const album = await this._albumsService.getAlbumById(id);
+    const songs = await this._albumsService.getSongsByAlbumId(id);
+    album.songs = songs;
 
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', '', { album });
   }
 
   async putAlbumByIdHandler(req, res) {
-    try {
-      this._validator.validateAlbumPayload(req.payload);
-      const { id } = req.params;
+    this._validator.validateAlbumPayload(req.payload);
+    const { id } = req.params;
 
-      await this._albumsService.editAlbumById(id, req.payload);
+    await this._albumsService.editAlbumById(id, req.payload);
 
-      return SUCCESS(res, 200, 'success', 'Update album successful');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
-
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', 'Update album successful');
   }
 
   async deleteAlbumByIdHandler(req, res) {
-    try {
-      const { id } = req.params;
-      await this._albumsService.deleteAlbumById(id);
+    const { id } = req.params;
+    await this._albumsService.deleteAlbumById(id);
 
-      return SUCCESS(res, 200, 'success', 'Delete album successful');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
-
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', 'Delete album successful');
   }
 }
 
