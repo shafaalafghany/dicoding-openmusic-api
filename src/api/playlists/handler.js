@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const { SUCCESS } = require('../../utils/constant');
 
 class PlaylistsHandler {

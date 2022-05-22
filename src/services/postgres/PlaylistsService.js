@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const tableName = 'playlists';
 const anotherTableName = 'users';
 const { Pool } = require('pg');

@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const tableName = 'playlist_songs';
 const anotherTableName = 'songs';
 const { Pool } = require('pg');

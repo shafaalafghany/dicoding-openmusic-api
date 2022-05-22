@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint-disable no-underscore-dangle */
 const tableName = 'songs';
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');

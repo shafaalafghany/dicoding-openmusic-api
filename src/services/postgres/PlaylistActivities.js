@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const tableName = 'playlist_song_activities';
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');

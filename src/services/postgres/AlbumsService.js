@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 const tableName = 'albums';
 const { nanoid } = require('nanoid');
 const { Pool } = require('pg');

@@ -145,7 +145,7 @@ const init = async () => {
   });
 
   await server.start();
-  console.log('app listen to port 5000');
+  console.log(`app listen to ${server.info.uri}`);
 };
 
 init();
