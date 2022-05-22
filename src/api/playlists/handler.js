@@ -1,7 +1,5 @@
-/* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
-const ClientError = require('../../exceptions/ClientError');
-const { SUCCESS, ERROR } = require('../../utils/constant');
+const { SUCCESS } = require('../../utils/constant');
 
 class PlaylistsHandler {
   constructor(
@@ -25,148 +23,99 @@ class PlaylistsHandler {
   }
 
   async postAddPlaylistHandler(req, res) {
-    try {
-      this._validator.validatePlaylistPayload(req.payload);
-      const { id } = req.auth.credentials;
-      req.payload.userId = id;
-      const playlistId = await this._playlistsService.addPlaylist(req.payload);
+    this._validator.validatePlaylistPayload(req.payload);
+    const { id } = req.auth.credentials;
 
-      return SUCCESS(res, 201, 'success', 'add new playlist successful', { playlistId });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    req.payload.userId = id;
+    const playlistId = await this._playlistsService.addPlaylist(req.payload);
 
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 201, 'success', 'add new playlist successful', { playlistId });
   }
 
   async postAddSongHandler(req, res) {
-    try {
-      this._validator.validatePlaylistSongPayloadSchema(req.payload);
-      const { id: playlistId } = req.params;
-      const { id: userId } = req.auth.credentials;
+    this._validator.validatePlaylistSongPayloadSchema(req.payload);
+    const { id: playlistId } = req.params;
+    const { id: userId } = req.auth.credentials;
 
-      req.payload.playlistId = playlistId;
-      req.payload.userId = userId;
-      req.payload.action = 'add';
-      await this._playlistSongsService.addSong(req.payload);
-      await this._playlistActivities.addActivities(req.payload);
+    req.payload.playlistId = playlistId;
+    req.payload.userId = userId;
+    req.payload.action = 'add';
 
-      return SUCCESS(res, 201, 'success', 'add song to playlist successful');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    await this._playlistSongsService.addSong(req.payload);
+    await this._playlistActivities.addActivities(req.payload);
 
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 201, 'success', 'add song to playlist successful');
   }
 
   async getAllPlaylistsHandler(req, res) {
-    try {
-      const { id } = req.auth.credentials;
+    const { id } = req.auth.credentials;
 
-      const playlists = await this._playlistsService.getAllPlaylists(id);
+    const playlists = await this._playlistsService.getAllPlaylists(id);
 
-      return SUCCESS(res, 200, 'success', '', { playlists });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
-
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', '', { playlists });
   }
 
   async getAllActivityHandler(req, res) {
-    try {
-      const { id: playlistId } = req.params;
-      const { id: userId } = req.auth.credentials;
-      const data = {
-        playlistId,
-        userId,
-      };
+    const { id: playlistId } = req.params;
+    const { id: userId } = req.auth.credentials;
+    const data = {
+      playlistId,
+      userId,
+    };
 
-      await this._playlistsService.verifyPlaylistOwner(data);
-      const activities = await this._playlistActivities.getAllActivities(data);
-      return SUCCESS(res, 200, 'success', '', { playlistId, activities });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    await this._playlistsService.verifyPlaylistOwner(data);
+    const activities = await this._playlistActivities.getAllActivities(data);
 
-      return ERROR(res, 500, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', '', { playlistId, activities });
   }
 
   async getAllSongsHandler(req, res) {
-    try {
-      const { id } = req.params;
-      const { id: userId } = req.auth.credentials;
-      const data = {
-        playlistId: id,
-        userId,
-      };
-      await this._playlistsService.verifyPlaylistOwner(data);
-      const playlist = await this._playlistsService.getPlaylistById(id);
-      const newPlaylist = playlist[0];
-      const songs = await this._playlistSongsService.getAllSongs(id);
-      newPlaylist.songs = songs;
-      return SUCCESS(res, 200, 'success', '', { playlist: newPlaylist });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    const { id } = req.params;
+    const { id: userId } = req.auth.credentials;
+    const data = {
+      playlistId: id,
+      userId,
+    };
 
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    await this._playlistsService.verifyPlaylistOwner(data);
+    const playlist = await this._playlistsService.getPlaylistById(id);
+    const newPlaylist = playlist[0];
+    const songs = await this._playlistSongsService.getAllSongs(id);
+    newPlaylist.songs = songs;
+
+    return SUCCESS(res, 200, 'success', '', { playlist: newPlaylist });
   }
 
   async deletePlaylistHandler(req, res) {
-    try {
-      const { id: playlistId } = req.params;
-      const { id: userId } = req.auth.credentials;
-      const data = {
-        playlistId,
-        userId,
-      };
-      await this._playlistsService.verifyPlaylistOwner(data);
-      await this._playlistsService.deletePlaylist(playlistId);
+    const { id: playlistId } = req.params;
+    const { id: userId } = req.auth.credentials;
+    const data = {
+      playlistId,
+      userId,
+    };
 
-      return SUCCESS(res, 200, 'success', 'delete playlist successful');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    await this._playlistsService.verifyPlaylistOwner(data);
+    await this._playlistsService.deletePlaylist(playlistId);
 
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', 'delete playlist successful');
   }
 
   async deleteSongHandler(req, res) {
-    try {
-      this._validator.validatePlaylistSongPayloadSchema(req.payload);
-      const { id: userId } = req.auth.credentials;
-      const { id: playlistId } = req.params;
-      const data = {
-        playlistId,
-        userId,
-        songId: req.payload.songId,
-        action: 'delete',
-      };
+    this._validator.validatePlaylistSongPayloadSchema(req.payload);
+    const { id: userId } = req.auth.credentials;
+    const { id: playlistId } = req.params;
+    const data = {
+      playlistId,
+      userId,
+      songId: req.payload.songId,
+      action: 'delete',
+    };
 
-      await this._playlistsService.verifyPlaylistOwner(data);
-      await this._playlistSongsService.deleteSong(data);
-      await this._playlistActivities.addActivities(data);
-      return SUCCESS(res, 200, 'success', 'delete song from this playlist successful');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    await this._playlistsService.verifyPlaylistOwner(data);
+    await this._playlistSongsService.deleteSong(data);
+    await this._playlistActivities.addActivities(data);
 
-      return ERROR(res, error.statusCode, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', 'delete song from this playlist successful');
   }
 }
 
