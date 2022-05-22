@@ -1,4 +1,3 @@
-/* eslint-disable no-trailing-spaces */
 /* eslint-disable no-underscore-dangle */
 const tableName = 'playlists';
 const anotherTableName = 'users';
@@ -24,7 +23,7 @@ class PlaylistsService {
 
     const result = await this._pool.query(query);
 
-    if (!result) { 
+    if (!result) {
       throw new ServerError('There is something happen on server :D');
     }
 
