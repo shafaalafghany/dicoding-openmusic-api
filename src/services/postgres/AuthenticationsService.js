@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 /* eslint-disable no-underscore-dangle */
 const tableName = 'authentications';
 const { Pool } = require('pg');
