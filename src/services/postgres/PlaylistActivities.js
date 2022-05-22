@@ -1,4 +1,3 @@
-/* eslint-disable no-trailing-spaces */
 /* eslint-disable no-underscore-dangle */
 const tableName = 'playlist_song_activities';
 const { Pool } = require('pg');
