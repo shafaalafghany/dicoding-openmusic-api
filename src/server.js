@@ -1,48 +1,42 @@
 /* eslint-disable no-underscore-dangle */
 require('dotenv').config();
-
 const hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const Inert = require('@hapi/inert');
 const path = require('path');
-
+const { ERROR } = require('./utils/constant');
 //  Albums
 const albums = require('./api/albums');
 const AlbumService = require('./services/postgres/AlbumsService');
 const UserAlbumLikesService = require('./services/postgres/UserAlbumLikesService');
 const StorageService = require('./services/storage/StorageService');
 const AlbumsValidator = require('./validator/albums');
-
 //  Songs
 const songs = require('./api/songs');
 const SongService = require('./services/postgres/SongsService');
 const SongsValidator = require('./validator/songs');
-
 //  Users
 const users = require('./api/users');
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
-
 //  Authentications
 const authentications = require('./api/authentications');
 const AuthenticationService = require('./services/postgres/AuthenticationsService');
 const TokenManager = require('./tokenize/TokenManager');
 const AuthenticationsValidator = require('./validator/authentications');
-
 //  Playlists
 const playlists = require('./api/playlists');
 const PlaylistsService = require('./services/postgres/PlaylistsService');
 const PlaylistSongsService = require('./services/postgres/PlaylistSongsService');
 const PlaylistActivitiesService = require('./services/postgres/PlaylistActivities');
 const PlaylistsValidator = require('./validator/playlists');
-
 // Exports
 const _exports = require('./api/exports');
 const ProducerService = require('./services/rabbitmq/ProducerService');
 const ExportsValidator = require('./validator/exports');
-
 // Cache
 const CacheService = require('./services/redis/CacheService');
+const ClientError = require('./exceptions/ClientError');
 
 const init = async () => {
   const cacheService = new CacheService();
@@ -141,6 +135,14 @@ const init = async () => {
       },
     },
   ]);
+
+  server.ext('onPreResponse', (req, res) => {
+    const { response } = req;
+
+    if (response instanceof ClientError) return ERROR(res, response.statusCode, 'fail', response.message);
+
+    return response.continue || response;
+  });
 
   await server.start();
   console.log('app listen to port 5000');
