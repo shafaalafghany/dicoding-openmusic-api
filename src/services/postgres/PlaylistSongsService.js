@@ -1,4 +1,3 @@
-/* eslint-disable no-trailing-spaces */
 /* eslint-disable no-underscore-dangle */
 const tableName = 'playlist_songs';
 const anotherTableName = 'songs';
@@ -38,7 +37,7 @@ class PlaylistSongsService {
 
   async getAllSongs(id) {
     const query = {
-      text: 
+      text:
       `SELECT s.song_id, s.song_title, s.song_performer
       FROM ${anotherTableName} s
       JOIN ${tableName} ps on s.song_id = ps.song_id
