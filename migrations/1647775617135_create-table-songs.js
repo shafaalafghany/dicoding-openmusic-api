@@ -1,8 +1,6 @@
 /* eslint-disable arrow-parens */
 /* eslint-disable camelcase */
 
-// exports.shorthands = undefined;
-
 exports.up = pgm => {
   pgm.createTable('songs', {
     song_id: {
