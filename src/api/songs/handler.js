@@ -1,7 +1,5 @@
-/* eslint-disable consistent-return */
 /* eslint-disable no-underscore-dangle */
-const ClientError = require('../../exceptions/ClientError');
-const { SUCCESS, ERROR } = require('../../utils/constant');
+const { SUCCESS } = require('../../utils/constant');
 
 class SongHandler {
   constructor(service, validator) {
@@ -16,95 +14,58 @@ class SongHandler {
   }
 
   async postAddSongHandler(req, res) {
-    try {
-      this._validator.validateSongPayload(req.payload);
-      let songId;
+    this._validator.validateSongPayload(req.payload);
+    let songId;
 
-      if (req.payload.albumId !== undefined) {
-        songId = await this._service.addSongWithAlbumId(req.payload);
-      } else {
-        songId = await this._service.addSong(req.payload);
-      }
-
-      return SUCCESS(res, 201, 'success', 'add song successful', { songId });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, 400, 'fail', error.message);
-      }
-
-      return ERROR(res, 500, 'error', error.message);
+    if (req.payload.albumId !== undefined) {
+      songId = await this._service.addSongWithAlbumId(req.payload);
+    } else {
+      songId = await this._service.addSong(req.payload);
     }
+
+    return SUCCESS(res, 201, 'success', 'add song successful', { songId });
   }
 
   async getSongsHandler(req, res) {
-    try {
-      const { title, performer } = req.query;
-      let songs;
-      if (title !== undefined && performer !== undefined) {
-        songs = await this._service.getSongByTitleAndPerformer(req.query);
-      } else if (title !== undefined) {
-        songs = await this._service.getSongByTitle(req.query.title);
-      } else if (performer !== undefined) {
-        songs = await this._service.getSongByPerformer(req.query.performer);
-      } else {
-        songs = await this._service.getSongs();
-      }
+    const { title, performer } = req.query;
+    let songs;
 
-      return SUCCESS(res, 200, 'success', '', { songs });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, 400, 'fail', error.message);
-      }
-
-      return ERROR(res, 500, 'error', error.message);
+    if (title !== undefined && performer !== undefined) {
+      songs = await this._service.getSongByTitleAndPerformer(req.query);
+    } else if (title !== undefined) {
+      songs = await this._service.getSongByTitle(req.query.title);
+    } else if (performer !== undefined) {
+      songs = await this._service.getSongByPerformer(req.query.performer);
+    } else {
+      songs = await this._service.getSongs();
     }
+
+    return SUCCESS(res, 200, 'success', '', { songs });
   }
 
   async getSongByIdHandler(req, res) {
-    try {
-      const { id } = req.params;
-      const song = await this._service.getSongById(id);
+    const { id } = req.params;
 
-      return SUCCESS(res, 200, 'success', '', { song });
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    const song = await this._service.getSongById(id);
 
-      return ERROR(res, 500, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', '', { song });
   }
 
   async putSongByIdHandler(req, res) {
-    try {
-      this._validator.validateSongPayload(req.payload);
-      const { id } = req.params;
+    this._validator.validateSongPayload(req.payload);
+    const { id } = req.params;
 
-      await this._service.editSongById(id, req.payload);
+    await this._service.editSongById(id, req.payload);
 
-      return SUCCESS(res, 200, 'success', 'Update song successful');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
-
-      return ERROR(res, 500, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', 'Update song successful');
   }
 
   async deleteSongByIdHandler(req, res) {
-    try {
-      const { id } = req.params;
-      await this._service.deleteSongById(id);
+    const { id } = req.params;
 
-      return SUCCESS(res, 200, 'success', 'Delete song successful');
-    } catch (error) {
-      if (error instanceof ClientError) {
-        return ERROR(res, error.statusCode, 'fail', error.message);
-      }
+    await this._service.deleteSongById(id);
 
-      return ERROR(res, 500, 'error', error.message);
-    }
+    return SUCCESS(res, 200, 'success', 'Delete song successful');
   }
 }
 
